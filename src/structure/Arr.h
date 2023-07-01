@@ -74,4 +74,9 @@ static inline void Arr_map(Arr * arr, F f)
     return Slice_map(& slice, f);
 }
 
+static inline void Arr_del_items(Arr * arr, F f)
+{
+    Arr_map(arr, f);
+}
+
 #endif

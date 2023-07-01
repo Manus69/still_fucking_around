@@ -18,6 +18,11 @@ struct Vec
 };
 
 void Vec_push_ptr(Vec * vec, const void * item, Put put);
+void Vec_remove_index(Vec * vec, I32 index);
+void Vec_remove_index_buff(void * target, Vec * vec, I32 index, Put put);
+STATUS Vec_remove(Vec * vec, const void * item, Cmp cmp);
+STATUS Vec_remove_buff(void * target, Vec * vec, const void * item, Cmp cmp, Put put);
+
 mem_put_gen(Vec)
 mem_swap_gen(Vec)
 
@@ -57,6 +62,11 @@ static inline I32 Vec_capacity(const Vec * vec)
 static inline I32 Vec_len(const Vec * vec)
 {
     return vec->index;
+}
+
+static inline I32 Vec_item_size(const Vec * vec)
+{
+    return Arr_item_size(& vec->arr);
 }
 
 static inline I32 Vec_remaining_capacity(const Vec * vec)
@@ -102,6 +112,25 @@ static inline void Vec_map(Vec * vec, F f)
 static inline void Vec_del_items(Vec * vec, F f)
 {
     Vec_map(vec, f);
+}
+
+static inline I32 Vec_find(const Vec * vec, const void * item, Cmp cmp)
+{
+    Slice slice;
+
+    slice = Vec_to_Slice(vec);
+
+    return Slice_find(& slice, item, cmp);
+}
+
+static inline bool Vec_contains(const Vec * vec, const void * item, Cmp cmp)
+{
+    return Vec_find(vec) != NO_INDEX;
+}
+
+static inline void * Vec_pop(Vec * vec)
+{
+    return Vec_get(vec, -- vec->index);
 }
 
 #endif

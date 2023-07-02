@@ -146,4 +146,17 @@ static inline void * Vec_pop(Vec * vec)
     return Vec_get(vec, -- vec->index);
 }
 
+static inline void Vec_drop(Vec * vec, I32 n_items)
+{
+    vec->index -= n_items;
+}
+
+static inline void Vec_rev(Vec * vec)
+{
+    Slice slice;
+
+    slice = Vec_to_Slice(vec);
+    Slice_rev(& slice);
+}
+
 #endif

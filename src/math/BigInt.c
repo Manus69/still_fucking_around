@@ -147,3 +147,38 @@ I64 BigInt_cmp(const BigInt * lhs, const BigInt * rhs)
 
     return I32_cmp(& lhs_digits, & rhs_digits);
 }
+
+static inline void _to_zero(BigInt * number)
+{
+    Vec_drop(& number->digits, BigInt_n_digits(number) - 1);
+    _set(number, 0, 0);
+}
+
+static inline void _decr(BigInt * number, I32 index, U32 value)
+{
+    U32 current;
+
+    current = _get(number, index);
+    _set(number, index, current - value);
+}
+
+void BigInt_decr(BigInt * lhs, const BigInt * rhs)
+{
+    U64     result;
+    I32     n_digits;
+    bool    carry;
+
+    if (BigInt_cmp(lhs, rhs) <= 0) return _to_zero(lhs);
+
+    n_digits = BigInt_n_digits(lhs);
+    carry = 0;
+
+    for (I32 index = 0; index < n_digits; index ++)
+    {
+        result = _get(lhs, index) - _checked_get(rhs, index) - carry;
+        _set(lhs, index, result % DIGIT_BASE);
+        carry = (result >= DIGIT_BASE);
+    }
+
+    while (Vec_last(& lhs->digits) == 0) Vec_pop(& lhs->digits);
+}

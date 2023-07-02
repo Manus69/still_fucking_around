@@ -42,4 +42,9 @@ static inline BigInt BigInt_dup(const BigInt * number)
     return (BigInt) {Vec_dup(& number->digits)};
 }
 
+static inline bool BigInt_is_zero(const BigInt * number)
+{
+    return (BigInt_n_digits(number) == 1) && (deref(U32) Vec_first(& number->digits) == 0); 
+}
+
 #endif

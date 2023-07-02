@@ -85,5 +85,11 @@ int main()
     // sort_test(1 << 25);
     // sort_test_txt();
     // Set_test();
-    BigInt_test();
+    // BigInt_test();
+
+    U8 x = 9;
+    U8 y = 7;
+
+    U8 z = (y - x) % 10;
+    debug_U8(& z);
 }

@@ -126,4 +126,18 @@ static inline Slice Slice_chop_checked(Slice * slice, I32 len)
     return len < Slice_len(slice) ? Slice_chop(slice, len) : Slice_chop_all(slice);
 }
 
+static inline void Slice_rev(Slice * slice, Swap swap)
+{
+    I32 mid;
+    I32 length;
+
+    length = Slice_len(slice);
+    mid = Slice_len(slice) / 2;
+    
+    for (I32 k = 0; k < mid; k ++)
+    {
+        swap(Slice_get(slice, k), Slice_get(length - k - 1));
+    }
+}
+
 #endif

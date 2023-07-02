@@ -136,7 +136,7 @@ static inline void Slice_rev(Slice * slice, Swap swap)
     
     for (I32 k = 0; k < mid; k ++)
     {
-        swap(Slice_get(slice, k), Slice_get(length - k - 1));
+        swap(Slice_get(slice, k), Slice_get(slice, length - k - 1));
     }
 }
 

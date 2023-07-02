@@ -180,5 +180,5 @@ void BigInt_decr(BigInt * lhs, const BigInt * rhs)
         carry = (result >= DIGIT_BASE);
     }
 
-    while (Vec_last(& lhs->digits) == 0) Vec_pop(& lhs->digits);
+    while (deref(U32) Vec_last(& lhs->digits) == 0) Vec_pop(& lhs->digits);
 }

@@ -14,6 +14,8 @@ struct BigInt
 //add mult div rem shift from str
 void BigInt_inc(BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_add(const BigInt * lhs, const BigInt * rhs);
+BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs);
+I64 BigInt_cmp(const BigInt * lhs, const BigInt * rhs);
 
 static inline BigInt BigInt_init(U32 n)
 {

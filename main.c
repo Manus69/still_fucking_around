@@ -67,14 +67,11 @@ void Set_test()
 #include "./math/BigInt.h"
 void BigInt_test()
 {
-    BigInt a = BigInt_init((U32) 1 << 31);
-    BigInt_inc(& a, & a);
-    BigInt b = BigInt_dup(& a);
-    BigInt_inc(& a, & a);
+    BigInt a = BigInt_init(1 << 30);
+    BigInt b = BigInt_init(4);
 
-    debug_BigInt(& a);
-
-    BigInt c = BigInt_add(& a, & b);
+    // BigInt c = BigInt_add(& a, & b);
+    BigInt c = BigInt_mult(& b, & a);
 
     debug_BigInt(& c);
 

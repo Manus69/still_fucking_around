@@ -34,7 +34,8 @@ void Vec_append_Vec(Vec * vec, const Vec * rhs)
 {
     Slice slice;
 
-    slice = Vec_to_Slice()
+    slice = Vec_to_Slice(rhs);
+    Vec_append_Slice(vec, & slice);
 }
 
 static inline void _shift_over(Vec * vec, I32 index)

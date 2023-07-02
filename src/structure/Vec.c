@@ -18,6 +18,25 @@ void Vec_push_ptr(Vec * vec, const void * item, Put put)
     Vec_set_ptr(vec, vec->index ++, item, put);
 }
 
+void Vec_append_from_ptr(Vec * vec, const void * ptr, I32 n_items)
+{
+    Vec_reserve(vec, n_items);
+    mem_copy(Vec_get(vec, vec->index), ptr, n_items, Vec_item_size(vec));
+    vec->index += n_items;
+}
+
+void Vec_append_Slice(Vec * vec, const Slice * slice)
+{
+    Vec_append_from_ptr(vec, Slice_first(slice), Slice_len(slice));
+}
+
+void Vec_append_Vec(Vec * vec, const Vec * rhs)
+{
+    Slice slice;
+
+    slice = Vec_to_Slice()
+}
+
 static inline void _shift_over(Vec * vec, I32 index)
 {
     mem_move(Vec_get(vec, index), 
@@ -45,7 +64,7 @@ STATUS Vec_remove(Vec * vec, const void * item, Cmp cmp)
 {
     I32 index;
 
-    if ((index = Vec_find(vec, item, cmp)) == NO_INDEX) return ;
+    if ((index = Vec_find(vec, item, cmp)) == NO_INDEX) return STATUS_NOT_OK;
     Vec_remove_index(vec, index);
 
     return STATUS_OK;

@@ -12,8 +12,8 @@ typedef struct Arr Arr;
 
 struct Arr
 {
-    I32     item_size;
     Block   block;
+    I32     item_size;
 };
 
 mem_put_gen(Arr)
@@ -21,7 +21,17 @@ mem_swap_gen(Arr)
 
 static inline Arr Arr_init(I32 item_size, I32 length)
 {
-    return (Arr) {item_size, Block_init(length * item_size)};
+    return (Arr) {Block_init(length * item_size), item_size};
+}
+
+static inline Arr Arr_init_zero(I32 item_size, I32 length)
+{
+    return (Arr) {Block_init_zero(length * item_size), item_size};
+}
+
+static inline Arr Arr_dup(const Arr * arr)
+{
+    return (Arr) {Block_dup(& arr->block), arr->item_size};
 }
 
 static inline void Arr_del(Arr * arr)
@@ -53,6 +63,16 @@ static inline void Arr_set_ptr(Arr * arr, I32 index, const void * item, Put put)
 static inline void Arr_extend(Arr * arr, I32 n_items)
 {
     Block_extend(& arr->block, n_items * arr->item_size);
+}
+
+static inline void Arr_extend_zero(Arr * arr, I32 n_items)
+{
+    Block_extend_zero(& arr->block, n_items * arr->item_size);
+}
+
+static inline void Arr_to_zero(Arr * arr, I32 index, I32 n_items)
+{
+    mem_set_zero(Arr_get(arr, index), n_items, arr->item_size);
 }
 
 static inline Slice Arr_slice(const Arr * arr, I32 index, I32 n_items)

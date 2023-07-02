@@ -13,8 +13,8 @@ typedef struct Vec Vec;
 
 struct Vec
 {
-    I32 index;
     Arr arr;
+    I32 index;
 };
 
 void Vec_push_ptr(Vec * vec, const void * item, Put put);
@@ -30,12 +30,17 @@ static inline Vec Vec_init_capacity(I32 item_size, I32 capacity)
 {
     assert(capacity > 0);
 
-    return (Vec) {0, Arr_init(item_size, capacity)};
+    return (Vec) {Arr_init(item_size, capacity), 0};
 }
 
 static inline Vec Vec_init(I32 item_size)
 {
     return Vec_init_capacity(item_size, VEC_DC);
+}
+
+static inline Vec Vec_dup(const Vec * vec)
+{
+    return (Vec) {Arr_dup(& vec->arr), vec->index};
 }
 
 static inline void Vec_del(Vec * vec)
@@ -91,6 +96,11 @@ static inline void Vec_reserve(Vec * vec, I32 n_items)
     Arr_extend(& vec->arr, n_items);
 }
 
+static inline void Vec_extend_zero(Vec * vec, I32 n_items)
+{
+    Arr_extend_zero(& vec->arr, n_items);
+}
+
 static inline Slice Vec_slice(const Vec * vec, I32 index, I32 n_items)
 {
     return Arr_slice(& vec->arr, index, n_items);
@@ -125,7 +135,7 @@ static inline I32 Vec_find(const Vec * vec, const void * item, Cmp cmp)
 
 static inline bool Vec_contains(const Vec * vec, const void * item, Cmp cmp)
 {
-    return Vec_find(vec) != NO_INDEX;
+    return Vec_find(vec, item, cmp) != NO_INDEX;
 }
 
 static inline void * Vec_pop(Vec * vec)

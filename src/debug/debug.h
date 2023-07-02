@@ -36,6 +36,11 @@ static inline void debug_U32(const void * ptr)
     _debug(ptr, U32, "%lu ");
 }
 
+static inline void debug_U64(const void * ptr)
+{
+    _debug(ptr, U64, "%zu ");
+}
+
 static inline void debug_U8(const void * ptr)
 {
     _debug(ptr, U8, "%u ");
@@ -89,11 +94,12 @@ static inline void debug_Str(const void * str)
 //     Str_destroy_structure(& str);
 // }
 
-// static inline void debug_Set(const void * set, void (* f)(const void *))
-// {
-//     Set_map((Set *) set, (F) f);
-//     debug_nl();
-// }
+#include "./structure/Set.h"
+static inline void debug_Set(const void * set, void (* f)(const void *))
+{
+    Set_map((Set *) set, (F) f);
+    debug_nl();
+}
 
 // static inline void debug_Heap(const void * heap, void (* f)(const void *))
 // {
@@ -101,15 +107,10 @@ static inline void debug_Str(const void * str)
 //     debug_nl();
 // }
 
-// static inline void debug_BigInt(const void * bigint)
-// {
-//     Str str;
-
-//     str = BigInt_to_Str(bigint);
-//     debug_Str(& str);
-//     debug_nl();
-
-//     Str_destroy_structure(& str);
-// }
+#include "./math/BigInt.h"
+static inline void debug_BigInt(const void * bigint)
+{
+    debug_Vec(& (deref(BigInt) bigint).digits, debug_U32);
+}
 
 #endif

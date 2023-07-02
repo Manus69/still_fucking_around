@@ -39,10 +39,27 @@ static inline void _rehash(Set * restrict target, const Set * restrict src, Hash
     }
 }
 
+static inline void _rebuild(Set * set, Hash hash, Cmp cmp, Put put)
+{
+    Set new_set;
+
+    new_set = Set_init(Set_item_size(set), Set_n_items(set));
+    _rehash(& new_set, set, hash, cmp, put);
+    Set_del(set);
+    set->buckets = new_set.buckets;
+}
+
+static inline bool _check_density(const Set * set)
+{
+    return Set_n_items(set) / _n_buckets(set) > SET_DENSITY_THRESHOLD;
+}
+
 STATUS Set_insert_ptr(Set * set, const void * item, Hash hash, Cmp cmp, Put put)
 {
     Vec * bucket;
     
+    if (unlikely(_check_density(set))) _rebuild(set, hash, cmp, put);
+
     bucket = _bucket(set, item, hash);
     if (Vec_contains(bucket, item, cmp)) return STATUS_NOT_OK;
 

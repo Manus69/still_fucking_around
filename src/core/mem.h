@@ -33,6 +33,10 @@ static inline void type##_swap(void * lhs, void * rhs) \
 static inline void type##_put(void * target, const void * src) \
 { deref(type) target = deref(type) src; }
 
+#define mem_cmp_gen(type) \
+static inline I64 type##_cmp(const void * lhs, const void * rhs) \
+{ return deref(type) lhs < deref(type) rhs ? -1 : deref(type) lhs > deref(type) rhs;}
+
 static inline void * mem_allocate(I32 size)
 {
     void * ptr;
@@ -73,6 +77,16 @@ static inline void * mem_extend(void * ptr, I32 current_size, I32 extra_size)
     return mem_reallocate(ptr, current_size + extra_size);
 }
 
+static inline void * mem_extend_zero(void * ptr, I32 current_size, I32 extra_size)
+{
+    void * _ptr;
+
+    _ptr = mem_extend(ptr, current_size, extra_size);
+    memset(_ptr + current_size, 0, extra_size);
+
+    return _ptr;
+}
+
 static inline void mem_map(void * data, I32 n_items, I32 item_size, F f)
 {
     while (n_items --)
@@ -101,6 +115,22 @@ static inline void * mem_dup(const void * ptr, I32 size)
 
     new_ptr = mem_allocate(size);
     return memcpy(new_ptr, ptr, size);
+}
+
+static inline void mem_set_zero(void * ptr, I32 n_items, I32 item_size)
+{
+    memset(ptr, 0, n_items * item_size);
+}
+
+static inline void * mem_shift(void * ptr, I32 current_size, I32 n_bytes)
+{
+    void * new_ptr;
+
+    new_ptr = mem_extend(ptr, current_size, n_bytes);
+    memmove(new_ptr + n_bytes, new_ptr, n_bytes);
+    memset(new_ptr, 0, n_bytes);
+
+    return new_ptr;
 }
 
 #endif

@@ -43,13 +43,50 @@ void sort_test_txt()
     
     sort(& v, Vec, Str);
     debug_Vec(& v, debug_Str);
-    
+
     Vec_del_items(& v, (F) Str_del);
     Vec_del(& v);
+}
+
+#include "./structure/Set.h"
+void Set_test()
+{
+    Set s = Set_init_t(I32);
+    I32 N = 1 << 5;
+
+    for (I32 k = 0; k < N; k ++)
+    {
+        Set_insert(& s, & k, I32);
+    }
+
+    debug_Set(& s, debug_I32);
+
+    Set_del(& s);
+}
+
+#include "./math/BigInt.h"
+void BigInt_test()
+{
+    BigInt a = BigInt_init((U32) 1 << 31);
+    BigInt_inc(& a, & a);
+    BigInt b = BigInt_dup(& a);
+    BigInt_inc(& a, & a);
+
+    debug_BigInt(& a);
+
+    BigInt c = BigInt_add(& a, & b);
+
+    debug_BigInt(& c);
+
+    BigInt_del(& a);
+    BigInt_del(& b);
+    BigInt_del(& c);
 }
 
 int main()
 {
     // sort_test(1 << 25);
-    sort_test_txt();
+    // sort_test_txt();
+    // Set_test();
+    BigInt_test();
 }

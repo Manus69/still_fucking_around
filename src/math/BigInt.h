@@ -11,11 +11,17 @@ struct BigInt
     Vec digits;
 };
 
-//add mult div rem shift from str
+//to do: div rem
 void BigInt_inc(BigInt * lhs, const BigInt * rhs);
+void BigInt_inc_U32(BigInt * lhs, U32 rhs);
+I64 BigInt_cmp(const BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_add(const BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs);
-I64 BigInt_cmp(const BigInt * lhs, const BigInt * rhs);
+BigInt BigInt_add_U32(const BigInt * number, U32 n);
+BigInt BigInt_mult_U32(const BigInt * number, U32 n);
+void BigInt_decr(BigInt * lhs, const BigInt * rhs);
+void BigInt_decr_U32(BigInt * number, U32 n);
+BigInt BigInt_sub(const BigInt * lhs, const BigInt * rhs);
 
 static inline BigInt BigInt_init(U32 n)
 {

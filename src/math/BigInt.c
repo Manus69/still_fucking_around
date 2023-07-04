@@ -74,6 +74,27 @@ BigInt BigInt_add(const BigInt * lhs, const BigInt * rhs)
     return result;
 }
 
+void BigInt_inc_U32(BigInt * lhs, U32 rhs)
+{
+    BigInt _rhs;
+
+    _rhs = BigInt_init(rhs);
+    BigInt_inc(lhs, & _rhs);
+    BigInt_del(& _rhs);
+}
+
+BigInt BigInt_add_U32(const BigInt * number, U32 n)
+{
+    BigInt rhs;
+    BigInt result;
+
+    rhs = BigInt_init(n);
+    result = BigInt_add(number, & rhs);
+    BigInt_del(& rhs);
+
+    return result;
+}
+
 static inline BigInt _partial_mult(const BigInt * number, U32 digit, I32 place)
 {
     BigInt  result;
@@ -115,6 +136,18 @@ BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs)
 
         BigInt_del(& partial_result);
     }
+
+    return result;
+}
+
+BigInt BigInt_mult_U32(const BigInt * number, U32 n)
+{
+    BigInt result;
+    BigInt rhs;
+
+    rhs = BigInt_init(n);
+    result = BigInt_mult(number, & rhs);
+    BigInt_del(& rhs);
 
     return result;
 }
@@ -181,4 +214,23 @@ void BigInt_decr(BigInt * lhs, const BigInt * rhs)
     }
 
     while (deref(U32) Vec_last(& lhs->digits) == 0) Vec_pop(& lhs->digits);
+}
+
+void BigInt_decr_U32(BigInt * number, U32 n)
+{
+    BigInt rhs;
+
+    rhs = BigInt_init(n);
+    BigInt_decr(number, & rhs);
+    BigInt_del(& rhs);
+}
+
+BigInt BigInt_sub(const BigInt * lhs, const BigInt * rhs)
+{
+    BigInt result;
+
+    result = BigInt_dup(lhs);
+    BigInt_decr(& result, rhs);
+    
+    return result;
 }

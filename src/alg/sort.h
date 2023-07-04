@@ -7,6 +7,7 @@
 #define sort(ptr, container_type, item_type) \
 {Slice _s = container_type##_to_Slice(ptr); sort_slice(& _s, item_type);}
 
+void sort_insert(Slice * slice, Cmp cmp, Put put, Swap swap);
 void sort_merge(Slice * slice, Cmp cmp, Put put, Swap swap);
 void sort_heap(Slice * slice, Cmp cmp, Put put, Swap swap);
 

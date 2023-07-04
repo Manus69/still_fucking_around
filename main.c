@@ -27,9 +27,10 @@ void sort_test(I32 len)
     }
 
     Slice s = Vec_to_Slice(& v);
-    // debug_Slice(& s, debug_I32);
     sort(& s, Slice, I32);
-    // debug_Vec(& v, debug_I32);
+    // sort_insert(& s, I32_cmp, I32_put, I32_swap);
+    // debug_Slice(& s, debug_I32);
+
     debug_I32(Vec_last(& v));
 
     Vec_del(& v);
@@ -82,14 +83,8 @@ void BigInt_test()
 
 int main()
 {
-    // sort_test(1 << 25);
+    sort_test(1 << 25);
     // sort_test_txt();
     // Set_test();
     // BigInt_test();
-
-    U8 x = 9;
-    U8 y = 7;
-
-    U8 z = (y - x) % 10;
-    debug_U8(& z);
 }

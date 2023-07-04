@@ -74,6 +74,41 @@ static inline void _check_swaps(Slice * restrict slice, Slice * restrict buffer,
     }
 }
 
+#define FRAME_SIZE (1 << 1)
+static inline I32 _preprocess_insert(Slice * slice, Cmp cmp, Put put, Swap swap)
+{
+    Slice new_slice;
+    Slice current;
+
+    new_slice = Slice_to_Slice(slice);
+    while (unlikely(Slice_empty(& new_slice) == false))
+    {
+        current = Slice_chop_checked(& new_slice, FRAME_SIZE);
+        sort_insert(& current, cmp, put, swap);
+    }
+
+    return FRAME_SIZE;
+}
+
+static inline I32 _preprocess_swap(Slice * slice, Cmp cmp, Swap swap)
+{
+    I32     length;
+    void *  lhs;
+    void *  rhs;
+
+    length = Slice_len(slice);
+
+    for (I32 index = 1; index < length; index += 2)
+    {
+        lhs = Slice_get(slice, index - 1);
+        rhs = Slice_get(slice, index);
+
+        if (cmp(lhs, rhs) > 0) swap(lhs, rhs);
+    }
+
+    return 2;
+}
+
 void sort_merge(Slice * slice, Cmp cmp, Put put, Swap swap)
 {
     Slice   buffer;
@@ -81,10 +116,9 @@ void sort_merge(Slice * slice, Cmp cmp, Put put, Swap swap)
     I32     length;
     I32     n_swaps;
 
-    (void) swap;
     length = Slice_len(slice);
     buffer = _get_buffer(length, Slice_item_size(slice));
-    frame_size = 1;
+    frame_size = _preprocess_swap(slice, cmp, swap);
     n_swaps = 0;
 
     while (frame_size <= length)

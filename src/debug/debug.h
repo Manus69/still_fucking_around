@@ -113,4 +113,13 @@ static inline void debug_BigInt(const void * bigint)
     debug_Vec(& (deref(BigInt) bigint).digits, debug_U32);
 }
 
+#include "./structure/Deck.h"
+static inline void debug_Deck(const void * deck, void (* f)(const void *))
+{
+    Slice slice;
+
+    slice = Deck_to_Slice(deck);
+    debug_Slice(& slice, f);
+}
+
 #endif

@@ -81,10 +81,29 @@ void BigInt_test()
     BigInt_del(& c);
 }
 
+#include "./structure/Deck.h"
+void Deck_test(I32 len)
+{
+    Deck d = Deck_init_t(I32);
+    for (I32 k = 0; k < len; k ++)
+    {
+        Deck_push_back(& d, len - k, I32);
+    }
+
+    for (I32 k = 0; k < len; k ++)
+    {
+        Deck_push_front(& d, len - k, I32);
+    }
+
+    debug_Deck(& d, debug_I32);
+    Deck_del(& d);
+}
+
 int main()
 {
-    sort_test(1 << 25);
+    // sort_test(1 << 25);
     // sort_test_txt();
     // Set_test();
     // BigInt_test();
+    Deck_test(10);
 }

@@ -29,7 +29,7 @@ static inline Arr Arr_init_zero(I32 item_size, I32 length)
     return (Arr) {Block_init_zero(length * item_size), item_size};
 }
 
-static inline Arr Arr_dup(const Arr * arr)
+static inline Arr Arr_copy(const Arr * arr)
 {
     return (Arr) {Block_dup(& arr->block), arr->item_size};
 }

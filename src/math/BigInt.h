@@ -1,56 +1,54 @@
 #ifndef BIGINT_H
 #define BIGINT_H
 
-#include "./structure/Vec.h"
-#include "./type/U32.h"
+#include "./structure/Deck.h"
+#include "./type/type.h"
 
 typedef struct BigInt BigInt;
 
 struct BigInt
 {
-    Vec digits;
+    Deck digits;
 };
 
-//to do: div rem
-void BigInt_inc(BigInt * lhs, const BigInt * rhs);
-void BigInt_inc_U32(BigInt * lhs, U32 rhs);
-I64 BigInt_cmp(const BigInt * lhs, const BigInt * rhs);
+mem_swap_gen(BigInt)
+mem_put_gen(BigInt)
+
+bool BigInt_is_zero(const BigInt * number);
+I64 BigInt_cmp(const void * lhs, const void * rhs);
+void BigInt_plus(BigInt * lhs, const BigInt * rhs);
+void BigInt_minus(BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_add(const BigInt * lhs, const BigInt * rhs);
+BigInt BigInt_subt(const BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs);
-BigInt BigInt_add_U32(const BigInt * number, U32 n);
-BigInt BigInt_mult_U32(const BigInt * number, U32 n);
-void BigInt_decr(BigInt * lhs, const BigInt * rhs);
-void BigInt_decr_U32(BigInt * number, U32 n);
-BigInt BigInt_sub(const BigInt * lhs, const BigInt * rhs);
 
-static inline BigInt BigInt_init(U32 n)
+//
+//U8 is a placeholder, change to U32
+//in debug, to str
+//
+static inline BigInt BigInt_init(U8 n)
 {
-    Vec digits;
+    Deck digits;
 
-    digits = Vec_init_t(U32);
-    Vec_push(& digits, n, U32);
+    digits = Deck_init_t(n);
+    Deck_push_back(& digits, n, U8);
 
     return (BigInt) {digits};
 }
 
 static inline I32 BigInt_n_digits(const BigInt * number)
 {
-    return Vec_len(& number->digits);
+    return Deck_len(& number->digits);
 }
 
 static inline void BigInt_del(BigInt * number)
 {
-    Vec_del(& number->digits);
+    Deck_del(& number->digits);
 }
 
-static inline BigInt BigInt_dup(const BigInt * number)
+static inline BigInt BigInt_copy(const BigInt * number)
 {
-    return (BigInt) {Vec_dup(& number->digits)};
-}
-
-static inline bool BigInt_is_zero(const BigInt * number)
-{
-    return (BigInt_n_digits(number) == 1) && (deref(U32) Vec_first(& number->digits) == 0); 
+    return (BigInt) {Deck_copy(& number->digits)};
 }
 
 #endif

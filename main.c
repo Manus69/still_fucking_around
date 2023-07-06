@@ -68,7 +68,7 @@ void Set_test()
 #include "./math/BigInt.h"
 void BigInt_test()
 {
-    BigInt a = BigInt_init(1 << 30);
+    BigInt a = BigInt_init(1 << 7);
     BigInt b = BigInt_init(4);
 
     // BigInt c = BigInt_add(& a, & b);
@@ -99,11 +99,12 @@ void Deck_test(I32 len)
     Deck_del(& d);
 }
 
+//bitfield
 int main()
 {
     // sort_test(1 << 25);
     // sort_test_txt();
     // Set_test();
-    // BigInt_test();
-    Deck_test(10);
+    BigInt_test();
+    // Deck_test(10);
 }

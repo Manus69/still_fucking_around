@@ -4,6 +4,8 @@
 #include "Arr.h"
 
 #define Deck_init_t(type) Deck_init(sizeof(type))
+#define Deck_set_t(deck_ptr, index, val, type) \
+{type _t = val; Deck_set_ptr(deck_ptr, index, & _t, type##_put);}
 #define Deck_push_front(deck_ptr, val, type) \
 {type _t = val; Deck_push_front_ptr(deck_ptr, & _t, type##_put);}
 #define Deck_push_back(deck_ptr, val, type) \
@@ -23,6 +25,8 @@ Deck Deck_init(I32 item_size);
 void * Deck_get(const Deck * deck, I32 index);
 void Deck_push_back_ptr(Deck * deck, const void * item, Put put);
 void Deck_push_front_ptr(Deck * deck, const void * item, Put put);
+void Deck_reserve_back(Deck * deck, I32 n_items);
+void Deck_reserve_front(Deck * deck, I32 n_items);
 
 static inline I32 Deck_len(const Deck * deck)
 {
@@ -85,6 +89,21 @@ static inline void Deck_map(Deck * deck, F f)
 static inline void Deck_del_items(Deck * deck, F f)
 {
     Deck_map(deck, f);
+}
+
+static inline void * Deck_pop_back(Deck * deck)
+{
+    return Deck_get(deck, -- deck->right);
+}
+
+static inline void * Deck_pop_front(Deck * deck)
+{
+    return Deck_get(deck, ++ deck->left);
+}
+
+static inline Deck Deck_copy(const Deck * deck)
+{
+    return (Deck) {Arr_copy(& deck->data), deck->left, deck->right};
 }
 
 #endif

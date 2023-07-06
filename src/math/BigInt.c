@@ -2,235 +2,206 @@
 #include "../type/U32.h"
 #include "./debug/debug.h"
 
-#define DIGIT_BASE (((U64) 1) << 32)
+#define BASE ((U64) 1 << (sizeof(U8) * BPB))
 
-static inline U32 _get(const BigInt * number, I32 index)
+static inline void _reserve_back(BigInt * number, I32 capacity)
 {
-    return deref(U32) Vec_get(& number->digits, index);
+    Deck_reserve_back(& number->digits, capacity);
 }
 
-static inline U32 _checked_get(const BigInt * number, I32 index)
+static inline U8 _get(const BigInt * number, I32 index)
 {
-    return index < BigInt_n_digits(number) ? _get(number, index) : 0;
+    return deref(U8) Deck_get(& number->digits, index);
 }
 
-static inline void _set(BigInt * number, I32 index, U32 digit)
+static inline U8 _checked_get(const BigInt * number, I32 index)
 {
-    Vec_set_ptr(& number->digits, index, & digit, U32_put);
+    return index < Deck_len(& number->digits) ? _get(number, index) : 0;
 }
 
-static inline void _checked_set(BigInt * number, I32 index, U32 digit)
+static inline void _set(BigInt * number, I32 index, U8 val)
 {
-    if (index >= BigInt_n_digits(number)) return Vec_push_ptr(& number->digits, & digit, U32_put);
-
-    return _set(number, index, digit);
+    Deck_set_t(& number->digits, index, val, U8);
 }
 
-static inline void _reserve(BigInt * number, I32 capacity)
+//this is broken
+static inline void _set_push(BigInt * number, I32 index, U8 val)
 {
-    Vec_reserve(& number->digits, capacity);
+    if (index < BigInt_n_digits(number)) _set(number, index, val);
+
+    Deck_push_back(& number->digits, val, U8);
 }
 
-static inline I32 _max_digits(const BigInt * lhs, const BigInt * rhs)
+bool BigInt_is_zero(const BigInt * number)
 {
+    return (BigInt_n_digits(number) == 1) && (_get(number, 0) == 0); 
+}
+
+I64 BigInt_cmp(const void * lhs, const void * rhs)
+{
+    I32 lhs_digits;
+    I32 rhs_digits;
+    I64 result;
+
+    lhs_digits = BigInt_n_digits(lhs);
+    rhs_digits = BigInt_n_digits(rhs);
+    if (lhs_digits != BigInt_n_digits(rhs)) return I32_cmp(& lhs_digits, & rhs_digits);
+
+    for (I32 index = lhs_digits - 1; index >= 0; index --)
+    {
+        result = U8_cmp(Deck_get(& ((BigInt *)lhs)->digits, index), 
+                        Deck_get(& ((BigInt *)rhs)->digits, index));
+        
+        if (result) return result;
+    }
+
+    return 0;
+}
+
+static inline I32 _addition_setup(BigInt * target, const BigInt * lhs, const BigInt * rhs)
+{
+    I32 n_digits;
     I32 lhs_digits;
     I32 rhs_digits;
 
     lhs_digits = BigInt_n_digits(lhs);
     rhs_digits = BigInt_n_digits(rhs);
+    n_digits = max(lhs_digits, rhs_digits);
+    _reserve_back(target, n_digits + 1);
 
-    return max(lhs_digits, rhs_digits);
+    return n_digits;
 }
 
-void BigInt_inc(BigInt * lhs, const BigInt * rhs)
+void BigInt_plus(BigInt * lhs, const BigInt * rhs)
 {
     I32 n_digits;
-    I32 index;
     U64 result;
     U64 carry;
 
-    n_digits = _max_digits(lhs, rhs);
-    index = 0;
     carry = 0;
-
-    while (index < n_digits)
+    n_digits = _addition_setup(lhs, lhs, rhs);
+    for (I32 index = 0; index < n_digits; index ++)
     {
         result = _checked_get(lhs, index) + _checked_get(rhs, index) + carry;
-        _checked_set(lhs, index, result % DIGIT_BASE);
-        carry = result / DIGIT_BASE;
-        index ++;
+        _set_push(lhs, index, result % BASE);
+        carry = result / BASE;
     }
 
-    if (carry) _checked_set(lhs, index, 1);
+    if (carry) _set(lhs, n_digits, 1);
+}
+
+static inline void _to_zero(BigInt * number)
+{
+    BigInt_del(number);
+    * number = BigInt_init(0);
+}
+
+void BigInt_minus(BigInt * lhs, const BigInt * rhs)
+{
+    I32 n_digits;
+    U64 result;
+    U64 carry;
+
+    if (BigInt_cmp(lhs, rhs) <= 0) return _to_zero(lhs);
+
+    carry = 0;
+    n_digits = BigInt_n_digits(rhs);
+    for (I32 index = 0; (index < n_digits) || carry; index ++)
+    {
+        result = _get(lhs, index) + (BASE - _checked_get(rhs, index) - carry);
+        _set(lhs, index, result % BASE);
+        carry = result / BASE; 
+    }
+
+    while (-- n_digits && (_get(lhs, n_digits) == 0)) Deck_pop_back(& lhs->digits);
 }
 
 BigInt BigInt_add(const BigInt * lhs, const BigInt * rhs)
 {
     BigInt result;
 
-    result = BigInt_dup(lhs);
-    BigInt_inc(& result, rhs);
+    result = BigInt_copy(lhs);
+    BigInt_plus(& result, rhs);
 
     return result;
 }
 
-void BigInt_inc_U32(BigInt * lhs, U32 rhs)
+BigInt BigInt_subt(const BigInt * lhs, const BigInt * rhs)
 {
-    BigInt _rhs;
-
-    _rhs = BigInt_init(rhs);
-    BigInt_inc(lhs, & _rhs);
-    BigInt_del(& _rhs);
-}
-
-BigInt BigInt_add_U32(const BigInt * number, U32 n)
-{
-    BigInt rhs;
     BigInt result;
 
-    rhs = BigInt_init(n);
-    result = BigInt_add(number, & rhs);
-    BigInt_del(& rhs);
+    result = BigInt_copy(lhs);
+    BigInt_minus(& result, rhs);
 
     return result;
 }
 
-static inline BigInt _partial_mult(const BigInt * number, U32 digit, I32 place)
+static inline void _rshift(BigInt * number, I32 n)
 {
-    BigInt  result;
+    while (n --) Deck_push_front(& number->digits, 0, U8);
+}
+
+static inline void _lshift(BigInt * number, I32 n)
+{
+    while (n --) Deck_pop_front(& number->digits);
+}
+
+static inline BigInt _empty()
+{
+    BigInt number;
+
+    number = BigInt_init(0);
+    Deck_pop_back(& number.digits);
+
+    return number;
+}
+
+static inline BigInt _mult(const BigInt * number, U8 n)
+{
+    BigInt  _number;
     I32     n_digits;
-    U64     product;
+    U64     result;
     U64     carry;
 
-    result = BigInt_init(0);
-    for (I32 n = 0; n < place; n ++) Vec_push(& result.digits, 0, U32);
-
+    _number = _empty();
     n_digits = BigInt_n_digits(number);
     carry = 0;
 
     for (I32 index = 0; index < n_digits; index ++)
     {
-        product = digit * _get(number, index) + carry;
-        _checked_set(& result, index + place, product % DIGIT_BASE);
-        carry = product / DIGIT_BASE;
+        result = _get(number, index) * n + carry;
+        Deck_push_back(& _number.digits, result % BASE, U8);
+        carry = result / BASE;
     }
 
-    if (carry) _checked_set(& result, n_digits, carry);
+    if (carry) Deck_push_back(& _number.digits, carry, U8);
 
-    return result;
+    return _number;
 }
 
 BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs)
 {
     BigInt  result;
-    BigInt  partial_result;
+    BigInt  partial;
     I32     n_digits;
 
-    result = BigInt_init(0);
+    if (BigInt_cmp(lhs, rhs) < 0) mem_swap_t(& lhs, & rhs, Ptr);
     n_digits = BigInt_n_digits(rhs);
-
-    for (I32 k = 0; k < n_digits; k ++)
-    {
-        partial_result = _partial_mult(lhs, _get(rhs, k), k);
-        BigInt_inc(& result, & partial_result);
-
-        BigInt_del(& partial_result);
-    }
-
-    return result;
-}
-
-BigInt BigInt_mult_U32(const BigInt * number, U32 n)
-{
-    BigInt result;
-    BigInt rhs;
-
-    rhs = BigInt_init(n);
-    result = BigInt_mult(number, & rhs);
-    BigInt_del(& rhs);
-
-    return result;
-}
-
-static inline I64 _cmp(const BigInt * lhs, const BigInt * rhs)
-{
-    U32 lhs_digit;
-    U32 rhs_digit;
-
-    for (I32 index = BigInt_n_digits(lhs) - 1; index >= 0; index --)
-    {
-        lhs_digit = _get(lhs, index);
-        rhs_digit = _get(rhs, index);
-
-        if (lhs_digit != rhs_digit) return U32_cmp(& lhs_digit, & rhs_digit);
-    }
-
-    return 0;
-}
-
-I64 BigInt_cmp(const BigInt * lhs, const BigInt * rhs)
-{
-    I32 lhs_digits;
-    I32 rhs_digits;
-
-    lhs_digits = BigInt_n_digits(lhs);
-    rhs_digits = BigInt_n_digits(rhs);
-
-    if (lhs_digits == rhs_digits) return _cmp(lhs, rhs);
-
-    return I32_cmp(& lhs_digits, & rhs_digits);
-}
-
-static inline void _to_zero(BigInt * number)
-{
-    Vec_drop(& number->digits, BigInt_n_digits(number) - 1);
-    _set(number, 0, 0);
-}
-
-static inline void _decr(BigInt * number, I32 index, U32 value)
-{
-    U32 current;
-
-    current = _get(number, index);
-    _set(number, index, current - value);
-}
-
-void BigInt_decr(BigInt * lhs, const BigInt * rhs)
-{
-    U64     result;
-    I32     n_digits;
-    bool    carry;
-
-    if (BigInt_cmp(lhs, rhs) <= 0) return _to_zero(lhs);
-
-    n_digits = BigInt_n_digits(lhs);
-    carry = 0;
+    result = BigInt_init(0);
 
     for (I32 index = 0; index < n_digits; index ++)
     {
-        result = _get(lhs, index) - _checked_get(rhs, index) - carry;
-        _set(lhs, index, result % DIGIT_BASE);
-        carry = (result >= DIGIT_BASE);
+        partial = _mult(lhs, _get(rhs, index));
+        //
+        debug_BigInt(& partial);
+        //
+        _rshift(& partial, index);
+        //
+        debug_BigInt(& partial);
+        //
+        BigInt_plus(& result, & partial);
+        BigInt_del(& partial);
     }
 
-    while (deref(U32) Vec_last(& lhs->digits) == 0) Vec_pop(& lhs->digits);
-}
-
-void BigInt_decr_U32(BigInt * number, U32 n)
-{
-    BigInt rhs;
-
-    rhs = BigInt_init(n);
-    BigInt_decr(number, & rhs);
-    BigInt_del(& rhs);
-}
-
-BigInt BigInt_sub(const BigInt * lhs, const BigInt * rhs)
-{
-    BigInt result;
-
-    result = BigInt_dup(lhs);
-    BigInt_decr(& result, rhs);
-    
     return result;
 }

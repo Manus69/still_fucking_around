@@ -107,12 +107,6 @@ static inline void debug_Set(const void * set, void (* f)(const void *))
 //     debug_nl();
 // }
 
-#include "./math/BigInt.h"
-static inline void debug_BigInt(const void * bigint)
-{
-    debug_Vec(& (deref(BigInt) bigint).digits, debug_U32);
-}
-
 #include "./structure/Deck.h"
 static inline void debug_Deck(const void * deck, void (* f)(const void *))
 {
@@ -120,6 +114,12 @@ static inline void debug_Deck(const void * deck, void (* f)(const void *))
 
     slice = Deck_to_Slice(deck);
     debug_Slice(& slice, f);
+}
+
+#include "./math/BigInt.h"
+static inline void debug_BigInt(const void * bigint)
+{
+    debug_Deck(& (deref(BigInt) bigint).digits, debug_U8);
 }
 
 #endif

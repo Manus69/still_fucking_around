@@ -79,4 +79,18 @@ void Deck_push_front_ptr(Deck * deck, const void * item, Put put)
     Arr_set_ptr(& deck->data, deck->left --, item, put);
 }
 
+void Deck_reserve_back(Deck * deck, I32 n_items)
+{
+    if (_back_capacity(deck) >= n_items) return ;
+
+    _extend_back(deck, n_items - _back_capacity(deck));
+}
+
+void Deck_reserve_front(Deck * deck, I32 n_items)
+{
+    if (_front_capacity(deck) >= n_items) return ;
+
+    _extend_front(deck, n_items - _front_capacity(deck));
+}
+
 //сафнов алекс

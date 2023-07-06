@@ -41,9 +41,9 @@ static inline Vec Vec_init(I32 item_size)
     return Vec_init_capacity(item_size, VEC_DC);
 }
 
-static inline Vec Vec_dup(const Vec * vec)
+static inline Vec Vec_copy(const Vec * vec)
 {
-    return (Vec) {Arr_dup(& vec->arr), vec->index};
+    return (Vec) {Arr_copy(& vec->arr), vec->index};
 }
 
 static inline void Vec_del(Vec * vec)

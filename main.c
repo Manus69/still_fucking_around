@@ -69,7 +69,7 @@ void Set_test()
 void BigInt_test()
 {
     BigInt a = BigInt_init(1 << 7);
-    BigInt b = BigInt_init(4);
+    BigInt b = BigInt_init(255);
 
     // BigInt c = BigInt_add(& a, & b);
     BigInt c = BigInt_mult(& b, & a);
@@ -99,7 +99,7 @@ void Deck_test(I32 len)
     Deck_del(& d);
 }
 
-//bitfield
+//bitfield heap pair
 int main()
 {
     // sort_test(1 << 25);

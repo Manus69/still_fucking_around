@@ -11,6 +11,14 @@ struct BigInt
     Deck digits;
 };
 
+typedef struct BigIntQR BigIntQR;
+
+struct BigIntQR
+{
+    BigInt quotient;
+    BigInt remainder;
+};
+
 mem_swap_gen(BigInt)
 mem_put_gen(BigInt)
 
@@ -49,6 +57,22 @@ static inline void BigInt_del(BigInt * number)
 static inline BigInt BigInt_copy(const BigInt * number)
 {
     return (BigInt) {Deck_copy(& number->digits)};
+}
+
+static inline BigInt BigIntQR_quotient(const BigIntQR * qr)
+{
+    return qr->quotient;
+}
+
+static inline BigInt BigIntQR_remainder(const BigIntQR * qr)
+{
+    return qr->remainder;
+}
+
+static inline void BigIntQR_del(BigIntQR * qr)
+{
+    BigInt_del(qr->quotient);
+    BigInt_del(qr->remainder);
 }
 
 #endif

@@ -1,5 +1,4 @@
 #include "BigInt.h"
-#include "../type/U32.h"
 #include "./debug/debug.h"
 
 #define BASE ((U64) 1 << (sizeof(U8) * BPB))
@@ -89,6 +88,11 @@ void BigInt_plus(BigInt * lhs, const BigInt * rhs)
     if (carry) _set(lhs, n_digits, 1);
 }
 
+void BigInt_plus_U8(BigInt * lhs, U8 rhs)
+{
+    
+}
+
 static inline void _to_zero(BigInt * number)
 {
     BigInt_del(number);
@@ -108,11 +112,16 @@ void BigInt_minus(BigInt * lhs, const BigInt * rhs)
     for (I32 index = 0; (index < n_digits) || carry; index ++)
     {
         result = _get(lhs, index) + (BASE - _checked_get(rhs, index) - carry);
+        carry = _get(lhs, index) < _checked_get(rhs, index);
         _set(lhs, index, result % BASE);
-        carry = result / BASE; 
     }
 
-    while (-- n_digits && (_get(lhs, n_digits) == 0)) Deck_pop_back(& lhs->digits);
+    n_digits = BigInt_n_digits(lhs);
+    for (I32 index = n_digits - 1; index > 0; index --)
+    {
+        if (_get(lhs, index) != 0) return ;
+        Deck_pop_back(& lhs->digits);
+    }
 }
 
 BigInt BigInt_add(const BigInt * lhs, const BigInt * rhs)
@@ -221,7 +230,7 @@ static inline BigInt _get_multiple(const BigInt * lhs, const BigInt * rhs)
     multiple = _compute_multiple(_get(lhs, lhs_high), _get(rhs, rhs_high));
     shift = multiple >= BASE ? 1 : 0;
     result = BigInt_init(shift ? multiple / BASE : multiple);
-    shift += (lhs_high - rhs_high);
+    shift += (lhs_high - rhs_high - 1);
     _rshift(& result, shift);
 
     return result;
@@ -247,12 +256,82 @@ BigIntQR BigInt_div(const BigInt * lhs, const BigInt * rhs)
         multiple = _get_multiple(& remainder, rhs);
         partial = BigInt_mult(& multiple, rhs);
 
+        //
+        // debug_BigInt2(& remainder);
+        // debug_BigInt2(& multiple);
+        // debug_BigInt2(& partial);
+        //
+
         BigInt_minus(& remainder, & partial);
         BigInt_plus(& quotient, & multiple);
+        
+        //
+        // debug_BigInt2(& remainder);
+        // debug_BigInt2(& quotient);
+        //
 
         BigInt_del(& multiple);
         BigInt_del(& partial);
     }
 
     return (BigIntQR) {quotient, remainder};
+}
+
+BigIntQR BigInt_div_U8(const BigInt * lhs, U8 val)
+{
+    BigInt      rhs;
+    BigIntQR    result;
+
+    rhs = BigInt_init(val);
+    result = BigInt_div(lhs, & rhs);
+    BigInt_del(& rhs);
+
+    return result;
+}
+
+#define BI_STR_DC (1 << 4)
+Str BigInt_to_Str(const BigInt * number)
+{
+    Str         result;
+    Str         current;
+    BigInt      temp;
+    BigIntQR    qr;
+    U8          digit;
+
+    result = Str_init(BI_STR_DC);
+    temp = BigInt_copy(number);
+
+    while (true)
+    {
+        qr = BigInt_div_U8(& temp, 10);
+        digit = _get(BigIntQR_remainder(& qr), 0);
+        current = U8_to_Str(& digit);
+        Str_append(& result, & current);
+        Str_del(& current);
+
+        BigInt_del(& temp);
+        temp = BigInt_copy(BigIntQR_quotient(& qr));
+        BigIntQR_del(& qr);
+
+        if (BigInt_is_zero(& temp)) break ;
+    }
+
+    BigInt_del(& temp);
+    Str_rev(& result);
+
+    return result;
+}
+
+BigInt BigInt_from_Str(const Str * str)
+{
+    BigInt  number;
+    U8      digit;
+    Slice   slice;
+
+    slice = Str_to_Slice(str);
+    while (Slice_empty(& slice) == false)
+    {
+        digit = deref(U8) Slice_last(& slice);
+
+    }
 }

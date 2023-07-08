@@ -16,7 +16,7 @@ Str Str_concat(const Str * lhs, const Str * rhs)
 
 static inline void _extend(Str * str, I32 n_bytes)
 {
-    mem_extend(str->bytes, str->capacity, n_bytes);
+    str->bytes = mem_extend(str->bytes, str->capacity, n_bytes);
     str->capacity += n_bytes;
 }
 
@@ -28,7 +28,7 @@ static inline void _check_extend(Str * str, I32 n_bytes)
 
 static inline STATUS _check_capacity(const Str * str, I32 n_bytes)
 {
-    return str->capacity - str->length - 1 >= n_bytes ? STATUS_OK : STATUS_NOT_OK;
+    return str->capacity - str->length > n_bytes ? STATUS_OK : STATUS_NOT_OK;
 }
 
 void Str_append(Str * lhs, const Str * rhs)
@@ -39,6 +39,7 @@ void Str_append(Str * lhs, const Str * rhs)
     }
 
     memcpy(Str_last(lhs) + 1, rhs->bytes, Str_len(rhs) + 1);
+    lhs->length += Str_len(rhs);
 }
 
 static inline I32 _find_c(const Slice * slice, char c)

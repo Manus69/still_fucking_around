@@ -119,7 +119,18 @@ static inline void debug_Deck(const void * deck, void (* f)(const void *))
 #include "./math/BigInt.h"
 static inline void debug_BigInt(const void * bigint)
 {
-    debug_Deck(& (deref(BigInt) bigint).digits, debug_U8);
+    Str str;
+
+    str = BigInt_to_Str(bigint);
+    debug_Str(& str);
+    debug_nl();
+    Str_del(& str);
+}
+
+static inline void debug_BigInt2(const void * number)
+{
+    debug_Deck(& (deref(BigInt) number).digits, debug_U8);
+    debug_nl();
 }
 
 #endif

@@ -68,8 +68,8 @@ void Set_test()
 #include "./math/BigInt.h"
 void BigInt_test()
 {
-    BigInt a = BigInt_init(1 << 7);
-    BigInt b = BigInt_init(255);
+    BigInt a = BigInt_init(250);
+    BigInt b = BigInt_init(16);
 
     // BigInt c = BigInt_add(& a, & b);
     BigInt c = BigInt_mult(& b, & a);
@@ -107,4 +107,5 @@ int main()
     // Set_test();
     BigInt_test();
     // Deck_test(10);
+
 }

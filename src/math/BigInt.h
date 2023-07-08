@@ -29,6 +29,9 @@ void BigInt_minus(BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_add(const BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_subt(const BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs);
+BigIntQR BigInt_div(const BigInt * lhs, const BigInt * rhs);
+Str BigInt_to_Str(const BigInt * number);
+
 
 //
 //U8 is a placeholder, change to U32
@@ -59,20 +62,20 @@ static inline BigInt BigInt_copy(const BigInt * number)
     return (BigInt) {Deck_copy(& number->digits)};
 }
 
-static inline BigInt BigIntQR_quotient(const BigIntQR * qr)
+static inline BigInt * BigIntQR_quotient(const BigIntQR * qr)
 {
-    return qr->quotient;
+    return (BigInt *) & (qr->quotient);
 }
 
-static inline BigInt BigIntQR_remainder(const BigIntQR * qr)
+static inline BigInt * BigIntQR_remainder(const BigIntQR * qr)
 {
-    return qr->remainder;
+    return (BigInt *) & (qr->remainder);
 }
 
 static inline void BigIntQR_del(BigIntQR * qr)
 {
-    BigInt_del(qr->quotient);
-    BigInt_del(qr->remainder);
+    BigInt_del(& qr->quotient);
+    BigInt_del(& qr->remainder);
 }
 
 #endif

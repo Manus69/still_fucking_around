@@ -16,6 +16,12 @@ struct Str
 
 mem_put_gen(Str)
 mem_swap_gen(Str)
+mem_swap_gen(char)
+
+Str     Str_concat(const Str * lhs, const Str * rhs);
+void    Str_append(Str * lhs, const Str * rhs);
+Slice   Str_split_next_c(Slice * str_slice, char c);
+Vec     Str_split_c(const Str * str, char c);
 
 static inline I32 Str_cmp(const void * lhs, const void * rhs)
 {
@@ -135,9 +141,14 @@ static inline I32 Str_find_c(const Str * str, char c)
     return NO_INDEX;
 }
 
-Str     Str_concat(const Str * lhs, const Str * rhs);
-void    Str_append(Str * lhs, const Str * rhs);
-Slice   Str_split_next_c(Slice * str_slice, char c);
-Vec     Str_split_c(const Str * str, char c);
+static inline void Str_rev(Str * str)
+{
+    Slice slice;
+
+    slice = Str_to_Slice(str);
+    Slice_rev(& slice, char_swap);
+}
+
+
 
 #endif

@@ -4,11 +4,11 @@
 #include "./structure/Deck.h"
 #include "./type/type.h"
 
-typedef U32 Base;
+typedef U32 BaseDigitType;
 
-#define Base_put U32_put
-#define Base_to_Str U32_to_Str
-#define Base_cmp U32_cmp
+#define BaseDigitType_put U32_put
+#define BaseDigitType_to_Str U32_to_Str
+#define BaseDigitType_cmp U32_cmp
 
 typedef struct BigInt BigInt;
 
@@ -43,12 +43,12 @@ BigInt BigInt_from_cstr(const char * cstr);
 //
 //U8 is a placeholder, change to U32
 //
-static inline BigInt BigInt_init(Base n)
+static inline BigInt BigInt_init(BaseDigitType n)
 {
     Deck digits;
 
     digits = Deck_init_t(n);
-    Deck_push_back(& digits, n, Base);
+    Deck_push_back(& digits, n, BaseDigitType);
 
     return (BigInt) {digits};
 }

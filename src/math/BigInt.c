@@ -1,7 +1,7 @@
 #include "BigInt.h"
 #include "./debug/debug.h"
 
-#define BASE (((U64) 1) << (sizeof(Base) * BPB))
+#define BASE (((U64) 1) << (sizeof(BaseDigitType) * BPB))
 
 static inline void _reserve_back(BigInt * number, I32 capacity)
 {
@@ -10,7 +10,7 @@ static inline void _reserve_back(BigInt * number, I32 capacity)
 
 static inline U64 _get(const BigInt * number, I32 index)
 {
-    return deref(Base) Deck_get(& number->digits, index);
+    return deref(BaseDigitType) Deck_get(& number->digits, index);
 }
 
 static inline U64 _checked_get(const BigInt * number, I32 index)
@@ -18,16 +18,16 @@ static inline U64 _checked_get(const BigInt * number, I32 index)
     return index < Deck_len(& number->digits) ? _get(number, index) : 0;
 }
 
-static inline void _set(BigInt * number, I32 index, Base val)
+static inline void _set(BigInt * number, I32 index, BaseDigitType val)
 {
-    Deck_set_t(& number->digits, index, val, Base);
+    Deck_set_t(& number->digits, index, val, BaseDigitType);
 }
 
-static inline void _set_push(BigInt * number, I32 index, Base val)
+static inline void _set_push(BigInt * number, I32 index, BaseDigitType val)
 {
     if (index < BigInt_n_digits(number)) return _set(number, index, val);
 
-    Deck_push_back(& number->digits, val, Base);
+    Deck_push_back(& number->digits, val, BaseDigitType);
 }
 
 bool BigInt_is_zero(const BigInt * number)
@@ -47,7 +47,7 @@ I64 BigInt_cmp(const void * lhs, const void * rhs)
 
     for (I32 index = lhs_digits - 1; index >= 0; index --)
     {
-        result = Base_cmp(Deck_get(& ((BigInt *)lhs)->digits, index), 
+        result = BaseDigitType_cmp(Deck_get(& ((BigInt *)lhs)->digits, index), 
                         Deck_get(& ((BigInt *)rhs)->digits, index));
         
         if (result) return result;
@@ -141,7 +141,7 @@ BigInt BigInt_subt(const BigInt * lhs, const BigInt * rhs)
 
 static inline void _rshift(BigInt * number, I32 n)
 {
-    while (n --) Deck_push_front(& number->digits, 0, Base);
+    while (n --) Deck_push_front(& number->digits, 0, BaseDigitType);
 }
 
 static inline void _lshift(BigInt * number, I32 n)
@@ -159,7 +159,7 @@ static inline BigInt _empty()
     return number;
 }
 
-static inline BigInt _mult(const BigInt * number, Base n)
+static inline BigInt _mult(const BigInt * number, BaseDigitType n)
 {
     BigInt  _number;
     I32     n_digits;
@@ -175,16 +175,16 @@ static inline BigInt _mult(const BigInt * number, Base n)
         result = _get(number, index);
         result = result * n + carry;
 
-        Deck_push_back(& _number.digits, result % BASE, Base);
+        Deck_push_back(& _number.digits, result % BASE, BaseDigitType);
         carry = result / BASE;
     }
 
-    if (carry) Deck_push_back(& _number.digits, carry, Base);
+    if (carry) Deck_push_back(& _number.digits, carry, BaseDigitType);
 
     return _number;
 }
 
-static inline BigInt _mult_assign(BigInt * number, Base n)
+static inline BigInt _mult_assign(BigInt * number, BaseDigitType n)
 {
     BigInt result;
 
@@ -217,7 +217,7 @@ BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs)
     return result;
 }
 
-static inline U64 _compute_multiple(Base lhs_digit, Base rhs_digit)
+static inline U64 _compute_multiple(BaseDigitType lhs_digit, BaseDigitType rhs_digit)
 {
     return ((lhs_digit * BASE) / (rhs_digit + 1));
 }
@@ -264,19 +264,8 @@ BigIntQR BigInt_div(const BigInt * lhs, const BigInt * rhs)
         multiple = _get_multiple(& remainder, rhs);
         partial = BigInt_mult(& multiple, rhs);
 
-        //
-        // debug_BigInt2(& remainder);
-        // debug_BigInt2(& multiple);
-        // debug_BigInt2(& partial);
-        //
-
         BigInt_minus(& remainder, & partial);
         BigInt_plus(& quotient, & multiple);
-        
-        //
-        // debug_BigInt2(& remainder);
-        // debug_BigInt2(& quotient);
-        //
 
         BigInt_del(& multiple);
         BigInt_del(& partial);
@@ -285,7 +274,7 @@ BigIntQR BigInt_div(const BigInt * lhs, const BigInt * rhs)
     return (BigIntQR) {quotient, remainder};
 }
 
-BigIntQR BigInt_div_Base(const BigInt * lhs, Base val)
+BigIntQR BigInt_div_Base(const BigInt * lhs, BaseDigitType val)
 {
     BigInt      rhs;
     BigIntQR    result;
@@ -300,11 +289,11 @@ BigIntQR BigInt_div_Base(const BigInt * lhs, Base val)
 #define BI_STR_DC (1 << 4)
 Str BigInt_to_Str(const BigInt * number)
 {
-    Str         result;
-    Str         current;
-    BigInt      temp;
-    BigIntQR    qr;
-    Base        digit;
+    Str             result;
+    Str             current;
+    BigInt          temp;
+    BigIntQR        qr;
+    BaseDigitType   digit;
 
     result = Str_init(BI_STR_DC);
     temp = BigInt_copy(number);
@@ -313,7 +302,7 @@ Str BigInt_to_Str(const BigInt * number)
     {
         qr = BigInt_div_Base(& temp, 10);
         digit = _get(BigIntQR_remainder(& qr), 0);
-        current = Base_to_Str(& digit);
+        current = BaseDigitType_to_Str(& digit);
         Str_append(& result, & current);
         Str_del(& current);
 
@@ -332,11 +321,11 @@ Str BigInt_to_Str(const BigInt * number)
 
 BigInt BigInt_from_Str(const Str * str)
 {
-    BigInt  number;
-    BigInt  current;
-    BigInt  base;
-    Base    digit;
-    Slice   slice;
+    BigInt          number;
+    BigInt          current;
+    BigInt          base;
+    BaseDigitType   digit;
+    Slice           slice;
 
     number = BigInt_init(0);
     base = BigInt_init(1);

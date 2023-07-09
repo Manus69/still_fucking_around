@@ -20,7 +20,7 @@ enum STATUS
 
 typedef uint_fast8_t    U8;
 typedef uint_fast64_t   U64;
-typedef uint_fast32_t   U32;
+typedef uint32_t        U32;
 typedef int_fast64_t    I64;
 typedef int_fast32_t    I32;
 typedef int_fast32_t    I32;

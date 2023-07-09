@@ -33,7 +33,7 @@ static inline void debug_I64(const void * ptr)
 
 static inline void debug_U32(const void * ptr)
 {
-    _debug(ptr, U32, "%lu ");
+    _debug(ptr, U32, "%u ");
 }
 
 static inline void debug_U64(const void * ptr)
@@ -129,7 +129,7 @@ static inline void debug_BigInt(const void * bigint)
 
 static inline void debug_BigInt2(const void * number)
 {
-    debug_Deck(& (deref(BigInt) number).digits, debug_U8);
+    debug_Deck(& (deref(BigInt) number).digits, debug_U32);
     debug_nl();
 }
 

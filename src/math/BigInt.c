@@ -1,33 +1,33 @@
 #include "BigInt.h"
 #include "./debug/debug.h"
 
-#define BASE ((U64) 1 << (sizeof(U8) * BPB))
+#define BASE (((U64) 1) << (sizeof(Base) * BPB))
 
 static inline void _reserve_back(BigInt * number, I32 capacity)
 {
     Deck_reserve_back(& number->digits, capacity);
 }
 
-static inline U8 _get(const BigInt * number, I32 index)
+static inline U64 _get(const BigInt * number, I32 index)
 {
-    return deref(U8) Deck_get(& number->digits, index);
+    return deref(Base) Deck_get(& number->digits, index);
 }
 
-static inline U8 _checked_get(const BigInt * number, I32 index)
+static inline U64 _checked_get(const BigInt * number, I32 index)
 {
     return index < Deck_len(& number->digits) ? _get(number, index) : 0;
 }
 
-static inline void _set(BigInt * number, I32 index, U8 val)
+static inline void _set(BigInt * number, I32 index, Base val)
 {
-    Deck_set_t(& number->digits, index, val, U8);
+    Deck_set_t(& number->digits, index, val, Base);
 }
 
-static inline void _set_push(BigInt * number, I32 index, U8 val)
+static inline void _set_push(BigInt * number, I32 index, Base val)
 {
     if (index < BigInt_n_digits(number)) return _set(number, index, val);
 
-    Deck_push_back(& number->digits, val, U8);
+    Deck_push_back(& number->digits, val, Base);
 }
 
 bool BigInt_is_zero(const BigInt * number)
@@ -47,7 +47,7 @@ I64 BigInt_cmp(const void * lhs, const void * rhs)
 
     for (I32 index = lhs_digits - 1; index >= 0; index --)
     {
-        result = U8_cmp(Deck_get(& ((BigInt *)lhs)->digits, index), 
+        result = Base_cmp(Deck_get(& ((BigInt *)lhs)->digits, index), 
                         Deck_get(& ((BigInt *)rhs)->digits, index));
         
         if (result) return result;
@@ -141,7 +141,7 @@ BigInt BigInt_subt(const BigInt * lhs, const BigInt * rhs)
 
 static inline void _rshift(BigInt * number, I32 n)
 {
-    while (n --) Deck_push_front(& number->digits, 0, U8);
+    while (n --) Deck_push_front(& number->digits, 0, Base);
 }
 
 static inline void _lshift(BigInt * number, I32 n)
@@ -159,7 +159,7 @@ static inline BigInt _empty()
     return number;
 }
 
-static inline BigInt _mult(const BigInt * number, U8 n)
+static inline BigInt _mult(const BigInt * number, Base n)
 {
     BigInt  _number;
     I32     n_digits;
@@ -172,17 +172,19 @@ static inline BigInt _mult(const BigInt * number, U8 n)
 
     for (I32 index = 0; index < n_digits; index ++)
     {
-        result = _get(number, index) * n + carry;
-        Deck_push_back(& _number.digits, result % BASE, U8);
+        result = _get(number, index);
+        result = result * n + carry;
+
+        Deck_push_back(& _number.digits, result % BASE, Base);
         carry = result / BASE;
     }
 
-    if (carry) Deck_push_back(& _number.digits, carry, U8);
+    if (carry) Deck_push_back(& _number.digits, carry, Base);
 
     return _number;
 }
 
-static inline BigInt _mult_assign(BigInt * number, U8 n)
+static inline BigInt _mult_assign(BigInt * number, Base n)
 {
     BigInt result;
 
@@ -215,7 +217,7 @@ BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs)
     return result;
 }
 
-static inline U64 _compute_multiple(U8 lhs_digit, U8 rhs_digit)
+static inline U64 _compute_multiple(Base lhs_digit, Base rhs_digit)
 {
     return ((lhs_digit * BASE) / (rhs_digit + 1));
 }
@@ -283,7 +285,7 @@ BigIntQR BigInt_div(const BigInt * lhs, const BigInt * rhs)
     return (BigIntQR) {quotient, remainder};
 }
 
-BigIntQR BigInt_div_U8(const BigInt * lhs, U8 val)
+BigIntQR BigInt_div_Base(const BigInt * lhs, Base val)
 {
     BigInt      rhs;
     BigIntQR    result;
@@ -302,16 +304,16 @@ Str BigInt_to_Str(const BigInt * number)
     Str         current;
     BigInt      temp;
     BigIntQR    qr;
-    U8          digit;
+    Base        digit;
 
     result = Str_init(BI_STR_DC);
     temp = BigInt_copy(number);
 
     while (true)
     {
-        qr = BigInt_div_U8(& temp, 10);
+        qr = BigInt_div_Base(& temp, 10);
         digit = _get(BigIntQR_remainder(& qr), 0);
-        current = U8_to_Str(& digit);
+        current = Base_to_Str(& digit);
         Str_append(& result, & current);
         Str_del(& current);
 
@@ -333,7 +335,7 @@ BigInt BigInt_from_Str(const Str * str)
     BigInt  number;
     BigInt  current;
     BigInt  base;
-    U8      digit;
+    Base    digit;
     Slice   slice;
 
     number = BigInt_init(0);

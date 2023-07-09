@@ -85,12 +85,7 @@ void BigInt_plus(BigInt * lhs, const BigInt * rhs)
         carry = result / BASE;
     }
 
-    if (carry) _set(lhs, n_digits, 1);
-}
-
-void BigInt_plus_U8(BigInt * lhs, U8 rhs)
-{
-    
+    if (carry) _set_push(lhs, n_digits, 1);
 }
 
 static inline void _to_zero(BigInt * number)
@@ -185,6 +180,17 @@ static inline BigInt _mult(const BigInt * number, U8 n)
     if (carry) Deck_push_back(& _number.digits, carry, U8);
 
     return _number;
+}
+
+static inline BigInt _mult_assign(BigInt * number, U8 n)
+{
+    BigInt result;
+
+    result = _mult(number, n);
+    BigInt_del(number);
+    * number = result;
+
+    return result;
 }
 
 BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs)
@@ -325,13 +331,39 @@ Str BigInt_to_Str(const BigInt * number)
 BigInt BigInt_from_Str(const Str * str)
 {
     BigInt  number;
+    BigInt  current;
+    BigInt  base;
     U8      digit;
     Slice   slice;
 
+    number = BigInt_init(0);
+    base = BigInt_init(1);
     slice = Str_to_Slice(str);
+
     while (Slice_empty(& slice) == false)
     {
-        digit = deref(U8) Slice_last(& slice);
+        digit = deref(char) Slice_last(& slice) - '0';
+        current = _mult(& base, digit);
+        BigInt_plus(& number, & current);
+        base = _mult_assign(& base, 10);
 
+        Slice_shrink(& slice, 1);
+        BigInt_del(& current);
     }
+
+    BigInt_del(& base);
+
+    return number;
+}
+
+BigInt BigInt_from_cstr(const char * cstr)
+{
+    Str     str;
+    BigInt  number;
+
+    str = Str_from_cstr(cstr);
+    number = BigInt_from_Str(& str);
+    Str_del(& str);
+
+    return number;
 }

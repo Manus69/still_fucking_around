@@ -68,11 +68,10 @@ void Set_test()
 #include "./math/BigInt.h"
 void BigInt_test()
 {
-    BigInt a = BigInt_init(250);
-    BigInt b = BigInt_init(16);
+    BigInt a = BigInt_from_cstr("1000000");
+    BigInt b = BigInt_from_cstr("666666");
 
-    // BigInt c = BigInt_add(& a, & b);
-    BigInt c = BigInt_mult(& b, & a);
+    BigInt c = BigInt_mult(& a, & b);
 
     debug_BigInt(& c);
 

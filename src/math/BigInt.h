@@ -31,11 +31,11 @@ BigInt BigInt_subt(const BigInt * lhs, const BigInt * rhs);
 BigInt BigInt_mult(const BigInt * lhs, const BigInt * rhs);
 BigIntQR BigInt_div(const BigInt * lhs, const BigInt * rhs);
 Str BigInt_to_Str(const BigInt * number);
-
+BigInt BigInt_from_Str(const Str * str);
+BigInt BigInt_from_cstr(const char * cstr);
 
 //
 //U8 is a placeholder, change to U32
-//in debug, to str
 //
 static inline BigInt BigInt_init(U8 n)
 {

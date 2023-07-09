@@ -81,7 +81,7 @@ void BigInt_test()
     "999999999""999999999""999999999""999999999""999999999"
     "999999999""999999999""999999999""999999999""999999999"
     "999999999""999999999""999999999""999999999""999999999");
-    // debug_BigInt(& a);
+    debug_BigInt(& a);
     BigInt b = BigInt_from_cstr(
     "999999999""999999999""999999999""999999999""999999999"
     "999999999""999999999""999999999""999999999""999999999"
@@ -95,7 +95,7 @@ void BigInt_test()
     "999999999""999999999""999999999""999999999""999999999"
     "999999999""999999999""999999999""999999999""999999999"
     "999999999""999999999""999999999""999999999""999999999");
-
+    // debug_BigInt(& b);
     BigInt c = BigInt_mult(& a, & b);
 
     // debug_BigInt2(& c);
@@ -124,13 +124,26 @@ void Deck_test(I32 len)
     Deck_del(& d);
 }
 
-//bitfield heap pair table
+#include "./structure/Pair.h"
+void Pair_test()
+{
+    Pair p = Pair_init_t(U8, Str);
+    Pair_set(& p, 137, Str_from_cstr("eat shit!"), U8, Str);
+    debug_U8(Pair_first(& p));
+    debug_Str(Pair_second(& p));
+
+    Pair_map_second(& p, (F) Str_del);
+    Pair_del(& p);
+}
+
+//bitfield heap table
 int main()
 {
     // sort_test(1 << 25);
     // sort_test_txt();
     // Set_test();
-    BigInt_test();
+    // BigInt_test();
     // Deck_test(10);
+    // Pair_test();
 
 }

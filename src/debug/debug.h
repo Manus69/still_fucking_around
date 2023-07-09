@@ -124,6 +124,7 @@ static inline void debug_BigInt(const void * bigint)
     str = BigInt_to_Str(bigint);
     debug_Str(& str);
     debug_nl();
+    debug_nl();
     Str_del(& str);
 }
 

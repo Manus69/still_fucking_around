@@ -22,6 +22,16 @@ Bfd Bfd_init(I32 n_bits)
     return (Bfd) {mem_zero(_n_bytes(n_bits)), _n_bytes(n_bits)};
 }
 
+Bfd Bfd_init_ones(I32 n_bits)
+{
+    Bfd bfd;
+
+    bfd = Bfd_init(n_bits);
+    memset(bfd.bytes, (U8)-1, bfd.n_bytes);
+
+    return bfd;
+}
+
 static inline I32 _byte_index(I32 bit_index)
 {
     return bit_index / BPB;

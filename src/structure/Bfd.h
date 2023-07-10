@@ -13,6 +13,7 @@ struct Bfd
 };
 
 Bfd     Bfd_init(I32 n_bits);
+Bfd     Bfd_init_ones(I32 n_bits);
 bool    Bfd_bit(const Bfd * bfd, I32 bit);
 void    Bfd_set(Bfd * bfd, I32 bit);
 void    Bfd_unset(Bfd * bfd, I32 bit);

@@ -153,7 +153,17 @@ void Bfd_test()
     Bfd_del(& bf);
 }
 
-//bitfield heap table
+#include "./math/Sieve.h"
+void Sieve_test(I32 n)
+{
+    Sieve s = Sieve_init(n);
+
+    bool t = Sieve_is_prime(& s, 661);
+    printf("%u\n", t);
+    Sieve_del(& s);
+}
+
+//heap table
 int main()
 {
     // sort_test(1 << 25);
@@ -162,5 +172,6 @@ int main()
     // BigInt_test();
     // Deck_test(10);
     // Pair_test();
-    Bfd_test();
+    // Bfd_test();
+    Sieve_test(10000000);
 }

@@ -83,16 +83,17 @@ static inline void debug_Str(const void * str)
     debug_cstr(& cstr);
 }
 
-// static inline void debug_BitField(const void * field)
-// {
-//     Str str;
+#include "./structure/Bfd.h"
+static inline void debug_Bfd(const void * field)
+{
+    Str str;
 
-//     str = BitField_to_Str(field);
-//     debug_Str(& str);
-//     debug_nl();
+    str = Bfd_to_Str(field);
+    debug_Str(& str);
+    debug_nl();
 
-//     Str_destroy_structure(& str);
-// }
+    Str_del(& str);
+}
 
 #include "./structure/Set.h"
 static inline void debug_Set(const void * set, void (* f)(const void *))
@@ -133,5 +134,7 @@ static inline void debug_BigInt2(const void * number)
     debug_Deck(& (deref(BigInt) number).digits, debug_U32);
     debug_nl();
 }
+
+
 
 #endif

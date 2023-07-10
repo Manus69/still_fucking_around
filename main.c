@@ -136,6 +136,23 @@ void Pair_test()
     Pair_del(& p);
 }
 
+#include "./structure/Bfd.h"
+void Bfd_test()
+{
+    Bfd bf = Bfd_init(100);
+    Bfd_set(& bf, 42);
+    debug_Bfd(& bf);
+    Bfd_unset(& bf, 42);
+    debug_Bfd(& bf);
+    Bfd_toggle(& bf, 69);
+    Bfd_toggle(& bf, 0);
+    debug_Bfd(& bf);
+    Bfd_toggle(& bf, 69);
+    debug_Bfd(& bf);
+
+    Bfd_del(& bf);
+}
+
 //bitfield heap table
 int main()
 {
@@ -145,5 +162,5 @@ int main()
     // BigInt_test();
     // Deck_test(10);
     // Pair_test();
-
+    Bfd_test();
 }

@@ -20,6 +20,7 @@ mem_swap_gen(char)
 
 Str     Str_concat(const Str * lhs, const Str * rhs);
 void    Str_append(Str * lhs, const Str * rhs);
+void    Str_append_c(Str * str, char c);
 Slice   Str_split_next_c(Slice * str_slice, char c);
 Vec     Str_split_c(const Str * str, char c);
 

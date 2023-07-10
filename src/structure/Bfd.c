@@ -1,6 +1,6 @@
 #include "Bfd.h"
 
-static U8 BIT_TABLE[] = 
+static U8 BIT_TABLE[BPB] = 
 {
     1,
     2,
@@ -12,7 +12,7 @@ static U8 BIT_TABLE[] =
     128,
 };
 
-static inline _n_bytes(I32 n_bits)
+static inline I32 _n_bytes(I32 n_bits)
 {
     return (n_bits / BPB) + 1; 
 }
@@ -54,8 +54,21 @@ void Bfd_toggle(Bfd * bfd, I32 bit)
 
 Str Bfd_to_Str(const Bfd * bfd)
 {
-    Str str;
-    U8  current;
+    char    letters[] = {'0', '1'};
+    Str     str;
+    U8      current;
 
     str = Str_init(bfd->n_bytes * BPB);
+    for (I32 index = 0; index < bfd->n_bytes; index ++)
+    {
+        current = bfd->bytes[index];
+        for (U8 bit = 0; bit < BPB; bit ++)
+        {
+            Str_append_c(& str, letters[(current & _bit(bit)) > 0]);
+        }
+
+        Str_append_c(& str, ' ');
+    }
+
+    return str;
 }

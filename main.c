@@ -158,9 +158,26 @@ void Sieve_test(I32 n)
 {
     Sieve s = Sieve_init(n);
 
-    bool t = Sieve_is_prime(& s, 661);
+    bool t = Sieve_is_prime(& s, 999331);
     printf("%u\n", t);
+
+    Vec p = Sieve_primes_less(& s, 1000);
+    debug_Vec(& p, debug_U64);
+
+    Vec_del(& p);
     Sieve_del(& s);
+}
+
+void Sieve_file_test(U32 n)
+{
+    // Sieve_to_file(n);
+    Sieve sieve = Sieve_from_file(n);
+    Vec primes = Sieve_primes_less(& sieve, n);
+    // debug_Vec(& primes, debug_U64);
+    debug_U64(Vec_last(& primes));
+
+    Sieve_del(& sieve);
+    Vec_del(& primes);
 }
 
 //heap table
@@ -173,5 +190,6 @@ int main()
     // Deck_test(10);
     // Pair_test();
     // Bfd_test();
-    Sieve_test(10000000);
+    // Sieve_test(1 << 20);
+    Sieve_file_test(1 << 10);
 }

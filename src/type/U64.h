@@ -2,9 +2,11 @@
 #define U64_H
 
 #include "./core/mem.h"
+#include "to_Str.h"
 
 mem_swap_gen(U64)
 mem_put_gen(U64)
+to_Str_gen(U64, "%zu")
 
 static inline I64 U64_cmp(const void * lhs, const void * rhs)
 {

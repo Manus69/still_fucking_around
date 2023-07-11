@@ -32,6 +32,11 @@ Bfd Bfd_init_ones(I32 n_bits)
     return bfd;
 }
 
+Bfd Bfd_init_from_bytes(const void * bytes, I32 n_bytes)
+{
+    return (Bfd) {(U8 *) bytes, n_bytes};
+}
+
 static inline I32 _byte_index(I32 bit_index)
 {
     return bit_index / BPB;

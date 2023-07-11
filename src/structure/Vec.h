@@ -17,14 +17,14 @@ struct Vec
     I32 index;
 };
 
-void Vec_push_ptr(Vec * vec, const void * item, Put put);
-void Vec_remove_index(Vec * vec, I32 index);
-void Vec_remove_index_buff(void * target, Vec * vec, I32 index, Put put);
-STATUS Vec_remove(Vec * vec, const void * item, Cmp cmp);
-STATUS Vec_remove_buff(void * target, Vec * vec, const void * item, Cmp cmp, Put put);
-void Vec_append_from_ptr(Vec * vec, const void * ptr, I32 n_items);
-void Vec_append_Slice(Vec * vec, const Slice * slice);
-void Vec_append_Vec(Vec * vec, const Vec * rhs);
+void    Vec_push_ptr(Vec * vec, const void * item, Put put);
+void    Vec_remove_index(Vec * vec, I32 index);
+void    Vec_remove_index_buff(void * target, Vec * vec, I32 index, Put put);
+void    Vec_append_from_ptr(Vec * vec, const void * ptr, I32 n_items);
+void    Vec_append_Slice(Vec * vec, const Slice * slice);
+void    Vec_append_Vec(Vec * vec, const Vec * rhs);
+STATUS  Vec_remove(Vec * vec, const void * item, Cmp cmp);
+STATUS  Vec_remove_buff(void * target, Vec * vec, const void * item, Cmp cmp, Put put);
 
 mem_put_gen(Vec)
 mem_swap_gen(Vec)

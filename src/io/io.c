@@ -41,3 +41,17 @@ Vec io_txt_file_lines(const char * name)
 
     return lines;
 }
+
+STATUS io_write_to_file_fd(int fd, const void * data, U64 size)
+{
+    return write(fd, data, size) >= 0 ? STATUS_OK : STATUS_NOT_OK;
+}
+
+STATUS io_write_to_file(const char * file_name, const void * data, U64 size)
+{
+    int fd;
+
+    if ((fd = open(file_name, O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR)) < 0) return STATUS_NOT_OK;
+
+    return io_write_to_file_fd(fd, data, size);
+}
